@@ -7,10 +7,15 @@ spring:
       group-id: ${spring.application.name}
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.always.right.inc.temperature_anomaly_detector
+        spring.json.type.mapping: temperature-measurement:com.always.right.inc.temperature_anomaly_detector.adapter.inbound.kafka.TemperatureMeasurementsListener$TemperatureMeasurementEvent
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    listener:
+      observation-enabled: true
   mongodb:
     # Of course this should be taken from secrets
     uri: mongodb://admin:secret@localhost:27017/temperature_anomaly_detector?authSource=admin
