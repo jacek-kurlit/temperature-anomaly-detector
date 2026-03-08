@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -33,6 +34,7 @@ public class TemperatureAnomalyDetectionService {
         anomalyDetectionAlgorithm
                 .accept(measurement)
                 .map(anomaly -> new TemperatureAnomalyDetectedEvent(
+                        UUID.randomUUID(),
                         roomId,
                         thermometerId,
                         anomaly.averageTemperature(),

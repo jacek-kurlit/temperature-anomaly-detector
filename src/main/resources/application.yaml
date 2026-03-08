@@ -10,7 +10,9 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: com.always.right.inc.temperature_anomaly_detector
-        spring.json.type.mapping: temperature-measurement:com.always.right.inc.temperature_anomaly_detector.adapter.inbound.kafka.TemperatureMeasurementEvent
+        spring.json.type.mapping: >
+          temperature-measurement:com.always.right.inc.temperature_anomaly_detector.adapter.inbound.kafka.TemperatureMeasurementEvent,
+          temperature-anomaly-detected:com.always.right.inc.temperature_anomaly_detector.service.TemperatureAnomalyDetectedEvent
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -21,6 +23,8 @@ spring:
   mongodb:
     # Of course this should be taken from secrets
     uri: mongodb://admin:secret@localhost:27017/temperature_anomaly_detector?authSource=admin
+    representation:
+      uuid: standard
 
 management:
   endpoints:

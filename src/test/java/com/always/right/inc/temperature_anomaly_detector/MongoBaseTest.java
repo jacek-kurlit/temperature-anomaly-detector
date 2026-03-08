@@ -1,5 +1,7 @@
 package com.always.right.inc.temperature_anomaly_detector;
 
+import org.bson.BsonDocument;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.mongodb.test.autoconfigure.DataMongoTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -16,6 +18,14 @@ public abstract class MongoBaseTest {
 
     @Autowired
     protected MongoTemplate mongoTemplate;
+
+    @BeforeEach
+    void cleanUp() {
+        mongoTemplate.getCollectionNames()
+                .forEach(collection -> mongoTemplate
+                        .getCollection(collection)
+                        .deleteMany(new BsonDocument()));
+    }
 
     @TestConfiguration(proxyBeanMethods = false)
     static class ContainerConfig {
