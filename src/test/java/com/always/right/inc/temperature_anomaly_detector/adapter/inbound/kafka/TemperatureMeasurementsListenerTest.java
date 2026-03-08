@@ -28,8 +28,8 @@ class TemperatureMeasurementsListenerTest extends KafkaBaseTest implements WithA
     void shouldDeserializeEventAndDelegateToService() {
         // given
         var event = new TemperatureMeasurementEvent(
-                new ThermometerId("thermo-001"),
-                new RoomId("room1"),
+                "thermo-001",
+                "room1",
                 23.5,
                 Instant.parse("2025-01-15T10:30:00Z")
         );
@@ -42,8 +42,8 @@ class TemperatureMeasurementsListenerTest extends KafkaBaseTest implements WithA
         await().atMost(5, SECONDS)
                 .untilAsserted(() -> {
                             verify(service).handle(
-                                    eq(event.roomId()),
-                                    eq(event.thermometerId()),
+                                    eq(new RoomId(event.roomId())),
+                                    eq(new ThermometerId(event.thermometerId())),
                                     measurementCaptor.capture()
                             );
                             assertThat(measurementCaptor.getValue().value()).isEqualTo(event.temperature());
@@ -56,7 +56,7 @@ class TemperatureMeasurementsListenerTest extends KafkaBaseTest implements WithA
         kafkaTemplate.send(
                 MessageBuilder.withPayload(event)
                         .setHeader(KafkaHeaders.TOPIC, "temperature-measurements")
-                        .setHeader(KafkaHeaders.KEY, event.thermometerId().value())
+                        .setHeader(KafkaHeaders.KEY, event.thermometerId())
                         .setHeader("__TypeId__", "temperature-measurement")
                         .build()
         );

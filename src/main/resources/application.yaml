@@ -42,3 +42,7 @@ anomaly-detection:
   type: consecutive
   threshold: 5.0
   window-size: 10
+anomaly-reporting:
+  thermometer-count-threshold: 5
+mongock:
+  migration-scan-package: com.always.right.inc.temperature_anomaly_detector.adapter.outbound.mongo.migration

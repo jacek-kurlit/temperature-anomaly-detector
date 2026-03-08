@@ -6,8 +6,8 @@ import com.always.right.inc.temperature_anomaly_detector.domain.ThermometerId;
 import java.time.Instant;
 
 public record TemperatureMeasurementEvent(
-        ThermometerId thermometerId,
-        RoomId roomId,
+        String thermometerId,
+        String roomId,
         Double temperature,
         Instant timestamp
 ) {

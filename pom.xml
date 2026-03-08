@@ -15,6 +15,7 @@
 	<description>The incorporation is always right</description>
 	<properties>
 		<java.version>25</java.version>
+        <mongock.version>5.5.1</mongock.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -63,6 +64,15 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+
+        <dependency>
+            <groupId>io.mongock</groupId>
+            <artifactId>mongock-springboot-v3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.mongock</groupId>
+            <artifactId>mongodb-springdata-v4-driver</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.assertj</groupId>
@@ -148,5 +158,17 @@
 			</plugin>
 		</plugins>
 	</build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.mongock</groupId>
+                <artifactId>mongock-bom</artifactId>
+                <version>${mongock.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>
