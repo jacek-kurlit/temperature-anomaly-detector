@@ -171,7 +171,7 @@ processing time per event.
 python metrics.py
 ```
 
-Example output:
+Example output (may take some time to show lag):
 
 ```
 Instance http://localhost:8080  [UP]
