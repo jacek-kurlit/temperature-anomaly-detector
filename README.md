@@ -49,6 +49,11 @@ are deduplicated by `anomalyId` before persisting — an anomaly already present
 Timestamps in events reflect the time the producer created the event, not the time the service processed it. No
 server-side validation or correction is applied.
 
+### Anomaly persistence may be postponed
+In order to speed up anomaly detection, anomaly persistence was moved to different event handler.
+This has one implication, system may take some time to sync up.
+In other words we traded consistency for performance.
+
 ## Prerequisites
 
 - Java 25
@@ -63,22 +68,11 @@ Start Kafka and MongoDB:
 docker compose up -d
 ```
 
-Create the Kafka topic:
-
-```bash
-docker compose exec kafka /opt/kafka/bin/kafka-topics.sh \
-  --bootstrap-server localhost:9092 \
-  --create \
-  --topic temperature-measurements \
-  --partitions 5 \
-  --replication-factor 1
-```
-
 ## Running the Application
 
-```bash
-./mvnw spring-boot:run
-```
+I was using intellij to start 2 instances.
+- One run without profile(8080)
+- One with 'second' profile active(8081)
 
 Actuator endpoints are available at `http://localhost:8080/actuator` (health, info, prometheus).
 
@@ -180,10 +174,23 @@ python metrics.py
 Example output:
 
 ```
-Topic                            Consumed   Total (ms)   Avg/event (ms)      Lag
---------------------------------------------------------------------------------
-temperature-anomalies              149418    283547.10            1.898   107287
-temperature-measurements           435666     14906.66            0.034        0
+Instance http://localhost:8080  [UP]
+  Topic                            Consumed   Total (ms)   Avg/event (ms)      Lag
+  ------------------------------------------------------------------------------
+  temperature-anomalies               55015    122676.50            2.230     5132
+  temperature-measurements           100000      5143.94            0.051        0
+
+Instance http://localhost:8081  [UP]
+  Topic                            Consumed   Total (ms)   Avg/event (ms)      Lag
+  ------------------------------------------------------------------------------
+  temperature-anomalies               55090    122795.00            2.229     2764
+  temperature-measurements           100000      5249.95            0.052        0
+
+Combined (all instances)
+  Topic                            Consumed   Total (ms)   Avg/event (ms)      Lag
+  ------------------------------------------------------------------------------
+  temperature-anomalies              110105    245471.50            2.229     7896
+  temperature-measurements           200000     10393.89            0.052        0
 ```
 
 Useful workflow during a stress test — snapshot before, run the stress test, snapshot after, and compare the deltas:

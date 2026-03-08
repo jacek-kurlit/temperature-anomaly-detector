@@ -31,10 +31,3 @@ X-Api-Key: {{apiKey}}
 ### Get thermometers above anomaly threshold (last 24 hours)
 GET {{baseUrl}}/api/temperatures/thermometers/above-threshold?fromDate=2025-01-14T00:00:00Z
 X-Api-Key: {{apiKey}}
-
-### Get thermometers above anomaly threshold - missing fromDate (expect 400)
-GET {{baseUrl}}/api/temperatures/thermometers/above-threshold
-X-Api-Key: {{apiKey}}
-
-### Get anomalies by thermometer - missing API key (expect 401)
-GET {{baseUrl}}/api/temperatures/{{thermometerId}}/anomalies

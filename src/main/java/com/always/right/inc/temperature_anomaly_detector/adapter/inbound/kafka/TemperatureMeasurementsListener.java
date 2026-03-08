@@ -19,6 +19,9 @@ public class TemperatureMeasurementsListener {
     @KafkaListener(topics = "temperature-measurements")
     public void handleTemperatureMeasurement(TemperatureMeasurementEvent event) {
         log.trace("Received temp measurement event for roomId: {}, thermometerId: {}", event.roomId(), event.thermometerId());
+        //TODO: we are missing events deduplication here
+        // kafka assures at least once delivery which means event can be resent and taken into
+        // account once more
         temperatureAnomalyDetectionService.handle(
                 new RoomId(event.roomId()),
                 new ThermometerId(event.thermometerId()),
