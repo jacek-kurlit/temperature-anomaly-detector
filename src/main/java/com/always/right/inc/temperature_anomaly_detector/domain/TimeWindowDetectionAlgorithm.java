@@ -6,6 +6,6 @@ public class TimeWindowDetectionAlgorithm implements AnomalyDetectionAlgorithm {
 
     @Override
     public Optional<AnomalyDetectionResult> accept(TemperatureMeasurement measurement) {
-        return null;
+        throw new IllegalStateException("Not implemented");
     }
 }

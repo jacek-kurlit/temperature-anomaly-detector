@@ -22,7 +22,7 @@ public class KafkaEventPublisher implements EventPublisher {
         kafkaTemplate.send(
                 MessageBuilder.withPayload(event)
                         .setHeader(KafkaHeaders.TOPIC, TOPIC)
-                        .setHeader(KafkaHeaders.KEY, event.thermometerId())
+//                        .setHeader(KafkaHeaders.KEY, event.thermometerId())
                         .setHeader("__TypeId__", TYPE_ID)
                         .build()
         );

@@ -14,11 +14,17 @@ import java.util.List;
 public class ApiKeyFilter extends OncePerRequestFilter {
 
     private static final String API_KEY_HEADER = "X-Api-Key";
+    private static final String PROTECTED_PATH_PREFIX = "/api/";
 
     private final String expectedApiKey;
 
     public ApiKeyFilter(String expectedApiKey) {
         this.expectedApiKey = expectedApiKey;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return !request.getRequestURI().startsWith(PROTECTED_PATH_PREFIX);
     }
 
     @Override
