@@ -35,8 +35,8 @@ public class TemperatureAnomalyDetectionService {
                 .accept(measurement)
                 .map(anomaly -> new TemperatureAnomalyDetectedEvent(
                         UUID.randomUUID(),
-                        roomId,
-                        thermometerId,
+                        roomId.value(),
+                        thermometerId.value(),
                         anomaly.averageTemperature(),
                         measurement.value(),
                         Instant.now()

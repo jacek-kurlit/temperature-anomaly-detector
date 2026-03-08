@@ -38,6 +38,9 @@ management:
     metrics:
       export:
         enabled: true
+api:
+  # Of course this should be taken from secrets
+  key: change-me
 anomaly-detection:
   type: consecutive
   threshold: 5.0

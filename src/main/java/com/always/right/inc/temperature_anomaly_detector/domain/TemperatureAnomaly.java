@@ -10,8 +10,8 @@ import java.util.UUID;
 public record TemperatureAnomaly(
         @Id
         UUID id,
-        String roomId,
-        String thermometerId,
+        RoomId roomId,
+        ThermometerId thermometerId,
         Double averageTemp,
         Double currentTemp,
         Instant createdAt

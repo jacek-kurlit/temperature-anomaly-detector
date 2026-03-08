@@ -16,9 +16,9 @@ public interface TemperatureAnomalyRepository {
 
     TemperatureAnomaly save(TemperatureAnomaly temperatureAnomaly);
 
-    Page<TemperatureAnomaly> findByThermometerIdOrderByCreatedAtDesc(String thermometerId, Pageable pageable);
+    Page<TemperatureAnomaly> findByThermometerIdOrderByCreatedAtDesc(ThermometerId thermometerId, Pageable pageable);
 
-    Page<TemperatureAnomaly> findByRoomIdOrderByCreatedAtDesc(String roomId, Pageable pageable);
+    Page<TemperatureAnomaly> findByRoomIdOrderByCreatedAtDesc(RoomId roomId, Pageable pageable);
 
     List<ThermometerAnomalyCount> findThermometersWithAnomalyCountExceeding(long threshold, Instant fromDate);
 }

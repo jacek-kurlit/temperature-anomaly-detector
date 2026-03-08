@@ -1,0 +1,40 @@
+### Variables
+@baseUrl = http://localhost:8080
+@thermometerId = thermo-001
+@roomId = living-room
+@apiKey = change-me
+
+### Get anomalies by thermometer (default pagination)
+GET {{baseUrl}}/api/temperatures/{{thermometerId}}/anomalies
+X-Api-Key: {{apiKey}}
+
+### Get anomalies by thermometer (custom pagination)
+GET {{baseUrl}}/api/temperatures/{{thermometerId}}/anomalies?page=0&pageSize=10
+X-Api-Key: {{apiKey}}
+
+### Get anomalies by thermometer (second page)
+GET {{baseUrl}}/api/temperatures/{{thermometerId}}/anomalies?page=1&pageSize=5
+X-Api-Key: {{apiKey}}
+
+### Get anomalies by room (default pagination)
+GET {{baseUrl}}/api/temperatures/rooms/{{roomId}}/anomalies
+X-Api-Key: {{apiKey}}
+
+### Get anomalies by room (custom pagination)
+GET {{baseUrl}}/api/temperatures/rooms/{{roomId}}/anomalies?page=0&pageSize=10
+X-Api-Key: {{apiKey}}
+
+### Get thermometers above anomaly threshold (from specific date)
+GET {{baseUrl}}/api/temperatures/thermometers/above-threshold?fromDate=2025-01-01T00:00:00Z
+X-Api-Key: {{apiKey}}
+
+### Get thermometers above anomaly threshold (last 24 hours)
+GET {{baseUrl}}/api/temperatures/thermometers/above-threshold?fromDate=2025-01-14T00:00:00Z
+X-Api-Key: {{apiKey}}
+
+### Get thermometers above anomaly threshold - missing fromDate (expect 400)
+GET {{baseUrl}}/api/temperatures/thermometers/above-threshold
+X-Api-Key: {{apiKey}}
+
+### Get anomalies by thermometer - missing API key (expect 401)
+GET {{baseUrl}}/api/temperatures/{{thermometerId}}/anomalies

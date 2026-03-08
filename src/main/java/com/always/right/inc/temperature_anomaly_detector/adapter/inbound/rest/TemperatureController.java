@@ -1,6 +1,8 @@
 package com.always.right.inc.temperature_anomaly_detector.adapter.inbound.rest;
 
+import com.always.right.inc.temperature_anomaly_detector.domain.RoomId;
 import com.always.right.inc.temperature_anomaly_detector.domain.TemperatureAnomaly;
+import com.always.right.inc.temperature_anomaly_detector.domain.ThermometerId;
 import com.always.right.inc.temperature_anomaly_detector.service.TemperatureAnomalyQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,7 +24,7 @@ public class TemperatureController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int pageSize
     ) {
-        return toResponse(queryService.getAnomaliesByThermometer(thermometerId, page, pageSize));
+        return toResponse(queryService.getAnomaliesByThermometer(new ThermometerId(thermometerId), page, pageSize));
     }
 
     @GetMapping("/rooms/{roomId}/anomalies")
@@ -31,7 +33,7 @@ public class TemperatureController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int pageSize
     ) {
-        return toResponse(queryService.getAnomaliesByRoom(roomId, page, pageSize));
+        return toResponse(queryService.getAnomaliesByRoom(new RoomId(roomId), page, pageSize));
     }
 
     @GetMapping("/thermometers/above-threshold")

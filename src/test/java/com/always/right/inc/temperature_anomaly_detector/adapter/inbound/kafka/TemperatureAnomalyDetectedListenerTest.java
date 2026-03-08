@@ -2,8 +2,6 @@ package com.always.right.inc.temperature_anomaly_detector.adapter.inbound.kafka;
 
 import com.always.right.inc.temperature_anomaly_detector.KafkaBaseTest;
 import com.always.right.inc.temperature_anomaly_detector.adapter.outbound.mongo.TemperatureAnomalyMongoRepository;
-import com.always.right.inc.temperature_anomaly_detector.domain.RoomId;
-import com.always.right.inc.temperature_anomaly_detector.domain.ThermometerId;
 import com.always.right.inc.temperature_anomaly_detector.service.TemperatureAnomalyDetectedEvent;
 import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,8 +38,8 @@ class TemperatureAnomalyDetectedListenerTest extends KafkaBaseTest implements Wi
         await().atMost(5, SECONDS).untilAsserted(() -> {
             var saved = repository.findById(event.anomalyId());
             assertThat(saved).isPresent();
-            assertThat(saved.get().roomId()).isEqualTo(event.roomId().value());
-            assertThat(saved.get().thermometerId()).isEqualTo(event.thermometerId().value());
+            assertThat(saved.get().roomId().value()).isEqualTo(event.roomId());
+            assertThat(saved.get().thermometerId().value()).isEqualTo(event.thermometerId());
             assertThat(saved.get().averageTemp()).isEqualTo(event.averageTemp());
             assertThat(saved.get().currentTemp()).isEqualTo(event.currentTemp());
             assertThat(saved.get().createdAt()).isEqualTo(event.timestamp());
@@ -67,7 +65,7 @@ class TemperatureAnomalyDetectedListenerTest extends KafkaBaseTest implements Wi
         kafkaTemplate.send(
                 MessageBuilder.withPayload(event)
                         .setHeader(KafkaHeaders.TOPIC, "temperature-anomalies")
-                        .setHeader(KafkaHeaders.KEY, event.thermometerId().value())
+                        .setHeader(KafkaHeaders.KEY, event.thermometerId())
                         .setHeader("__TypeId__", "temperature-anomaly-detected")
                         .build()
         );
@@ -76,8 +74,8 @@ class TemperatureAnomalyDetectedListenerTest extends KafkaBaseTest implements Wi
     private static TemperatureAnomalyDetectedEvent anomalyEvent(UUID id) {
         return new TemperatureAnomalyDetectedEvent(
                 id,
-                new RoomId("room1"),
-                new ThermometerId("thermo-001"),
+                "room1",
+                "thermo-001",
                 20.0,
                 27.5,
                 Instant.parse("2025-01-15T10:30:00Z")

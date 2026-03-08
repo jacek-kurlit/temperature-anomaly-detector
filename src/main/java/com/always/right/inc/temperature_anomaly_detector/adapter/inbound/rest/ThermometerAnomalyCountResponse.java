@@ -5,6 +5,6 @@ import com.always.right.inc.temperature_anomaly_detector.domain.ThermometerAnoma
 public record ThermometerAnomalyCountResponse(String thermometerId, long anomalyCount) {
 
     static ThermometerAnomalyCountResponse from(ThermometerAnomalyCount count) {
-        return new ThermometerAnomalyCountResponse(count.id(), count.count());
+        return new ThermometerAnomalyCountResponse(count.id().value(), count.count());
     }
 }

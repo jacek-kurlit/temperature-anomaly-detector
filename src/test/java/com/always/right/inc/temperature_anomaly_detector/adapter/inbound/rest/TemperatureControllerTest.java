@@ -1,8 +1,10 @@
 package com.always.right.inc.temperature_anomaly_detector.adapter.inbound.rest;
 
 import com.always.right.inc.temperature_anomaly_detector.RestBaseTest;
+import com.always.right.inc.temperature_anomaly_detector.domain.RoomId;
 import com.always.right.inc.temperature_anomaly_detector.domain.TemperatureAnomaly;
 import com.always.right.inc.temperature_anomaly_detector.domain.ThermometerAnomalyCount;
+import com.always.right.inc.temperature_anomaly_detector.domain.ThermometerId;
 import com.always.right.inc.temperature_anomaly_detector.service.TemperatureAnomalyQueryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -30,10 +32,10 @@ class TemperatureControllerTest extends RestBaseTest {
 
     @Test
     void shouldReturnAnomaliesForThermometer() throws Exception {
-        var thermometerId = "thermo-001";
+        var thermometerId = new ThermometerId("thermo-001");
         var anomaly = new TemperatureAnomaly(
                 UUID.fromString("00000000-0000-0000-0000-000000000001"),
-                "room1",
+                new RoomId("room1"),
                 thermometerId,
                 20.0,
                 27.5,
@@ -46,7 +48,7 @@ class TemperatureControllerTest extends RestBaseTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(1))
                 .andExpect(jsonPath("$.totalPages").value(1))
-                .andExpect(jsonPath("$.content[0].thermometerId").value(thermometerId))
+                .andExpect(jsonPath("$.content[0].thermometerId").value(thermometerId.value()))
                 .andExpect(jsonPath("$.content[0].roomId").value("room1"))
                 .andExpect(jsonPath("$.content[0].averageTemp").value(20.0))
                 .andExpect(jsonPath("$.content[0].currentTemp").value(27.5))
@@ -55,7 +57,7 @@ class TemperatureControllerTest extends RestBaseTest {
 
     @Test
     void shouldRespectPageAndPageSizeParams() throws Exception {
-        var thermometerId = "thermo-001";
+        var thermometerId = new ThermometerId("thermo-001");
         when(queryService.getAnomaliesByThermometer(thermometerId, 2, 5))
                 .thenReturn(new PageImpl<>(List.of(), PageRequest.of(2, 5), 0));
 
@@ -70,7 +72,7 @@ class TemperatureControllerTest extends RestBaseTest {
 
     @Test
     void shouldUseDefaultPaginationWhenParamsAbsent() throws Exception {
-        var thermometerId = "thermo-001";
+        ThermometerId thermometerId = new ThermometerId("thermo-001");
         when(queryService.getAnomaliesByThermometer(thermometerId, 0, 20))
                 .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 20), 0));
 
@@ -87,11 +89,11 @@ class TemperatureControllerTest extends RestBaseTest {
 
     @Test
     void shouldReturnAnomaliesForRoom() throws Exception {
-        var roomId = "room1";
+        RoomId roomId = new RoomId("room1");
         var anomaly = new TemperatureAnomaly(
                 UUID.fromString("00000000-0000-0000-0000-000000000002"),
                 roomId,
-                "thermo-001",
+                new ThermometerId("thermo-001"),
                 20.0,
                 27.5,
                 Instant.parse("2025-01-15T10:30:00Z")
@@ -103,7 +105,7 @@ class TemperatureControllerTest extends RestBaseTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(1))
                 .andExpect(jsonPath("$.totalPages").value(1))
-                .andExpect(jsonPath("$.content[0].roomId").value(roomId))
+                .andExpect(jsonPath("$.content[0].roomId").value(roomId.value()))
                 .andExpect(jsonPath("$.content[0].thermometerId").value("thermo-001"))
                 .andExpect(jsonPath("$.content[0].averageTemp").value(20.0))
                 .andExpect(jsonPath("$.content[0].currentTemp").value(27.5))
@@ -112,7 +114,7 @@ class TemperatureControllerTest extends RestBaseTest {
 
     @Test
     void shouldRespectPageAndPageSizeParamsForRoom() throws Exception {
-        var roomId = "room1";
+        var roomId = new RoomId("room1");
         when(queryService.getAnomaliesByRoom(roomId, 1, 10))
                 .thenReturn(new PageImpl<>(List.of(), PageRequest.of(1, 10), 0));
 
@@ -135,8 +137,8 @@ class TemperatureControllerTest extends RestBaseTest {
         var fromDate = Instant.parse("2025-01-01T00:00:00Z");
         when(queryService.getThermometersExceedingAnomalyThreshold(fromDate))
                 .thenReturn(List.of(
-                        new ThermometerAnomalyCount("thermo-001", 8),
-                        new ThermometerAnomalyCount("thermo-003", 12)
+                        new ThermometerAnomalyCount(new ThermometerId("thermo-001"), 8),
+                        new ThermometerAnomalyCount(new ThermometerId("thermo-003"), 12)
                 ));
 
         mockMvc.perform(get("/api/temperatures/thermometers/above-threshold")

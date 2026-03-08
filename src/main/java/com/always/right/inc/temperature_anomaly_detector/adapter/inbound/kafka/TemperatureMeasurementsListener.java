@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Slf4j
 public class TemperatureMeasurementsListener {
+
     private final TemperatureAnomalyDetectionService temperatureAnomalyDetectionService;
 
     @KafkaListener(topics = "temperature-measurements")
@@ -25,5 +26,4 @@ public class TemperatureMeasurementsListener {
         );
         log.trace("Event for roomId: {}, thermometerId: {} handled", event.roomId(), event.thermometerId());
     }
-
 }

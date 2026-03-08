@@ -16,8 +16,8 @@ public record TemperatureAnomalyResponse(
     static TemperatureAnomalyResponse from(TemperatureAnomaly anomaly) {
         return new TemperatureAnomalyResponse(
                 anomaly.id(),
-                anomaly.thermometerId(),
-                anomaly.roomId(),
+                anomaly.thermometerId().value(),
+                anomaly.roomId().value(),
                 anomaly.averageTemp(),
                 anomaly.currentTemp(),
                 anomaly.createdAt()

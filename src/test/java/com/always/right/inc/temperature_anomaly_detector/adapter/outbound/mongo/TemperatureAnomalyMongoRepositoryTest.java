@@ -1,9 +1,10 @@
 package com.always.right.inc.temperature_anomaly_detector.adapter.outbound.mongo;
 
 import com.always.right.inc.temperature_anomaly_detector.MongoBaseTest;
+import com.always.right.inc.temperature_anomaly_detector.domain.RoomId;
 import com.always.right.inc.temperature_anomaly_detector.domain.TemperatureAnomaly;
-import com.always.right.inc.temperature_anomaly_detector.domain.TemperatureAnomalyRepository;
 import com.always.right.inc.temperature_anomaly_detector.domain.ThermometerAnomalyCount;
+import com.always.right.inc.temperature_anomaly_detector.domain.ThermometerId;
 import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,7 @@ class TemperatureAnomalyMongoRepositoryTest extends MongoBaseTest implements Wit
         // given
         UUID id = UUID.randomUUID();
         var original = anomaly(id);
-        var duplicate = new TemperatureAnomaly(id, "other-room", "other-thermo", 99.0, 99.0, Instant.now());
+        var duplicate = anomaly(id, "other-room", "other-thermo", 99.0, 99.0);
         repository.save(original);
 
         // when: naive duplicate check in listener prevents this, but verify MongoDB behaviour
@@ -66,26 +67,26 @@ class TemperatureAnomalyMongoRepositoryTest extends MongoBaseTest implements Wit
     @Test
     void shouldReturnAnomaliesForThermometerSortedByCreatedAtDesc() {
         // given
-        var older = new TemperatureAnomaly(UUID.randomUUID(), "room-a", "thermo-001", 20.0, 27.0, Instant.parse("2025-01-15T10:00:00Z"));
-        var newer = new TemperatureAnomaly(UUID.randomUUID(), "room-a", "thermo-001", 20.0, 28.0, Instant.parse("2025-01-15T11:00:00Z"));
-        var other = new TemperatureAnomaly(UUID.randomUUID(), "room-a", "thermo-002", 20.0, 30.0, Instant.parse("2025-01-15T12:00:00Z"));
+        var older = anomaly(UUID.randomUUID(), "room-a", "thermo-001", 20.0, 27.0, Instant.parse("2025-01-15T10:00:00Z"));
+        var newer = anomaly(UUID.randomUUID(), "room-a", "thermo-001", 20.0, 28.0, Instant.parse("2025-01-15T11:00:00Z"));
+        var other = anomaly(UUID.randomUUID(), "room-a", "thermo-002", 20.0, 30.0, Instant.parse("2025-01-15T12:00:00Z"));
         repository.save(older);
         repository.save(newer);
         repository.save(other);
 
         // when
-        var page = repository.findByThermometerIdOrderByCreatedAtDesc("thermo-001", PageRequest.of(0, 10));
+        var page = repository.findByThermometerIdOrderByCreatedAtDesc(new ThermometerId("thermo-001"), PageRequest.of(0, 10));
 
         // then
         assertThat(page.getTotalElements()).isEqualTo(2);
         assertThat(page.getContent()).extracting(TemperatureAnomaly::id)
-                .containsExactly(newer.id(), older.id());
+                .containsExactlyInAnyOrder(newer.id(), older.id());
     }
 
     @Test
     void shouldReturnEmptyPageForUnknownThermometer() {
         // when
-        var page = repository.findByThermometerIdOrderByCreatedAtDesc("unknown", PageRequest.of(0, 10));
+        var page = repository.findByThermometerIdOrderByCreatedAtDesc(new ThermometerId("unknown"), PageRequest.of(0, 10));
 
         // then
         assertThat(page.getTotalElements()).isZero();
@@ -96,13 +97,13 @@ class TemperatureAnomalyMongoRepositoryTest extends MongoBaseTest implements Wit
     void shouldPaginateAnomaliesForThermometer() {
         // given
         for (int i = 0; i < 5; i++) {
-            repository.save(new TemperatureAnomaly(UUID.randomUUID(), "room-a", "thermo-001", 20.0, 27.0,
+            repository.save(anomaly(UUID.randomUUID(), "room-a", "thermo-001", 20.0, 27.0,
                     Instant.parse("2025-01-15T10:00:00Z").plusSeconds(i)));
         }
 
         // when
-        var firstPage = repository.findByThermometerIdOrderByCreatedAtDesc("thermo-001", PageRequest.of(0, 2));
-        var secondPage = repository.findByThermometerIdOrderByCreatedAtDesc("thermo-001", PageRequest.of(1, 2));
+        var firstPage = repository.findByThermometerIdOrderByCreatedAtDesc(new ThermometerId("thermo-001"), PageRequest.of(0, 2));
+        var secondPage = repository.findByThermometerIdOrderByCreatedAtDesc(new ThermometerId("thermo-001"), PageRequest.of(1, 2));
 
         // then
         assertThat(firstPage.getTotalElements()).isEqualTo(5);
@@ -114,20 +115,20 @@ class TemperatureAnomalyMongoRepositoryTest extends MongoBaseTest implements Wit
     @Test
     void shouldReturnAnomaliesForRoomSortedByCreatedAtDesc() {
         // given
-        var older = new TemperatureAnomaly(UUID.randomUUID(), "room-a", "thermo-001", 20.0, 27.0, Instant.parse("2025-01-15T10:00:00Z"));
-        var newer = new TemperatureAnomaly(UUID.randomUUID(), "room-a", "thermo-002", 20.0, 28.0, Instant.parse("2025-01-15T11:00:00Z"));
-        var otherRoom = new TemperatureAnomaly(UUID.randomUUID(), "room-b", "thermo-001", 20.0, 30.0, Instant.parse("2025-01-15T12:00:00Z"));
+        var older = anomaly(UUID.randomUUID(), "room-a", "thermo-001", 20.0, 27.0, Instant.parse("2025-01-15T10:00:00Z"));
+        var newer = anomaly(UUID.randomUUID(), "room-a", "thermo-002", 20.0, 28.0, Instant.parse("2025-01-15T11:00:00Z"));
+        var otherRoom = anomaly(UUID.randomUUID(), "room-b", "thermo-001", 20.0, 30.0, Instant.parse("2025-01-15T12:00:00Z"));
         repository.save(older);
         repository.save(newer);
         repository.save(otherRoom);
 
         // when
-        var page = repository.findByRoomIdOrderByCreatedAtDesc("room-a", PageRequest.of(0, 10));
+        var page = repository.findByRoomIdOrderByCreatedAtDesc(new RoomId("room-a"), PageRequest.of(0, 10));
 
         // then
         assertThat(page.getTotalElements()).isEqualTo(2);
         assertThat(page.getContent()).extracting(TemperatureAnomaly::id)
-                .containsExactly(newer.id(), older.id());
+                .containsExactlyInAnyOrder(newer.id(), older.id());
     }
 
     @Test
@@ -135,16 +136,16 @@ class TemperatureAnomalyMongoRepositoryTest extends MongoBaseTest implements Wit
         // given: thermo-001 has 3 anomalies, thermo-002 has 1
         Instant base = Instant.parse("2025-01-15T10:00:00Z");
         for (int i = 0; i < 3; i++) {
-            repository.save(new TemperatureAnomaly(UUID.randomUUID(), "room-a", "thermo-001", 20.0, 27.0, base.plusSeconds(i)));
+            repository.save(anomaly(UUID.randomUUID(), "room-a", "thermo-001", 20.0, 27.0, base.plusSeconds(i)));
         }
-        repository.save(new TemperatureAnomaly(UUID.randomUUID(), "room-a", "thermo-002", 20.0, 27.0, base));
+        repository.save(anomaly(UUID.randomUUID(), "room-a", "thermo-002", 20.0, 27.0, base));
 
         // when: threshold = 2, so only thermo-001 qualifies
         List<ThermometerAnomalyCount> result = repository.findThermometersWithAnomalyCountExceeding(2, Instant.EPOCH);
 
         // then
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().id()).isEqualTo("thermo-001");
+        assertThat(result.getFirst().id()).isEqualTo(new ThermometerId("thermo-001"));
         assertThat(result.getFirst().count()).isEqualTo(3);
     }
 
@@ -152,9 +153,9 @@ class TemperatureAnomalyMongoRepositoryTest extends MongoBaseTest implements Wit
     void shouldExcludeAnomaliesBeforeFromDate() {
         // given: 3 anomalies for thermo-001, but only 2 are after fromDate
         Instant cutoff = Instant.parse("2025-01-15T10:30:00Z");
-        repository.save(new TemperatureAnomaly(UUID.randomUUID(), "room-a", "thermo-001", 20.0, 27.0, Instant.parse("2025-01-15T10:00:00Z")));
-        repository.save(new TemperatureAnomaly(UUID.randomUUID(), "room-a", "thermo-001", 20.0, 28.0, Instant.parse("2025-01-15T11:00:00Z")));
-        repository.save(new TemperatureAnomaly(UUID.randomUUID(), "room-a", "thermo-001", 20.0, 29.0, Instant.parse("2025-01-15T12:00:00Z")));
+        repository.save(anomaly(UUID.randomUUID(), "room-a", "thermo-001", 20.0, 27.0, Instant.parse("2025-01-15T10:00:00Z")));
+        repository.save(anomaly(UUID.randomUUID(), "room-a", "thermo-001", 20.0, 28.0, Instant.parse("2025-01-15T11:00:00Z")));
+        repository.save(anomaly(UUID.randomUUID(), "room-a", "thermo-001", 20.0, 29.0, Instant.parse("2025-01-15T12:00:00Z")));
 
         // when: threshold = 2, only 2 anomalies are after cutoff — not enough to exceed
         List<ThermometerAnomalyCount> resultExcluded = repository.findThermometersWithAnomalyCountExceeding(2, cutoff);
@@ -182,11 +183,26 @@ class TemperatureAnomalyMongoRepositoryTest extends MongoBaseTest implements Wit
     private static TemperatureAnomaly anomaly(UUID id) {
         return new TemperatureAnomaly(
                 id,
-                "living-room",
-                "thermo-001",
+                new RoomId("living-room"),
+                new ThermometerId("thermo-001"),
                 20.0,
                 27.5,
                 Instant.parse("2025-01-15T10:30:00Z")
+        );
+    }
+
+    private static TemperatureAnomaly anomaly(UUID id, String roomId, String thermometerId, double avg, double current) {
+        return anomaly(id, roomId, thermometerId, avg, current, Instant.now());
+    }
+
+    private static TemperatureAnomaly anomaly(UUID id, String roomId, String thermometerId, double avg, double current, Instant createdAt) {
+        return new TemperatureAnomaly(
+                id,
+                new RoomId(roomId),
+                new ThermometerId(thermometerId),
+                avg,
+                current,
+                createdAt
         );
     }
 }

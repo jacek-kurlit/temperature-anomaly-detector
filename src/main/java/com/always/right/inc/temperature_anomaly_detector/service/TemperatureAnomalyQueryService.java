@@ -1,9 +1,7 @@
 package com.always.right.inc.temperature_anomaly_detector.service;
 
 import com.always.right.inc.temperature_anomaly_detector.config.AnomalyReportingProperties;
-import com.always.right.inc.temperature_anomaly_detector.domain.TemperatureAnomaly;
-import com.always.right.inc.temperature_anomaly_detector.domain.TemperatureAnomalyRepository;
-import com.always.right.inc.temperature_anomaly_detector.domain.ThermometerAnomalyCount;
+import com.always.right.inc.temperature_anomaly_detector.domain.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,11 +17,11 @@ public class TemperatureAnomalyQueryService {
     private final TemperatureAnomalyRepository repository;
     private final AnomalyReportingProperties reportingProperties;
 
-    public Page<TemperatureAnomaly> getAnomaliesByThermometer(String thermometerId, int page, int pageSize) {
+    public Page<TemperatureAnomaly> getAnomaliesByThermometer(ThermometerId thermometerId, int page, int pageSize) {
         return repository.findByThermometerIdOrderByCreatedAtDesc(thermometerId, PageRequest.of(page, pageSize));
     }
 
-    public Page<TemperatureAnomaly> getAnomaliesByRoom(String roomId, int page, int pageSize) {
+    public Page<TemperatureAnomaly> getAnomaliesByRoom(RoomId roomId, int page, int pageSize) {
         return repository.findByRoomIdOrderByCreatedAtDesc(roomId, PageRequest.of(page, pageSize));
     }
 

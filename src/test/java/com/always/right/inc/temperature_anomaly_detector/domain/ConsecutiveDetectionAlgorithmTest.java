@@ -61,7 +61,7 @@ class ConsecutiveDetectionAlgorithmTest implements WithAssertions {
         int windowSize = 10;
         ConsecutiveDetectionAlgorithm algorithm = init(20.0, windowSize / 2, threshold);
         algorithm.accept(measurement(30.0));
-        acceptValueNTimes(20.0, windowSize / 2 - 1, algorithm);
+        acceptValueNTimes(20.0, windowSize / 2 - 2, algorithm);
 
         // when
         Optional<AnomalyDetectionResult> anomaly = algorithm.accept(measurement(20.0));
@@ -120,8 +120,8 @@ class ConsecutiveDetectionAlgorithmTest implements WithAssertions {
         double threshold = 5.0;
         int windowSize = 10;
         ConsecutiveDetectionAlgorithm algorithm = new ConsecutiveDetectionAlgorithm(windowSize, threshold);
-        algorithm.accept(measurement(30.0));
         acceptValueNTimes(20.0, windowSize - 1, algorithm); // fills window: [30, 20x9]
+        algorithm.accept(measurement(30.0));
 
         // 30 should be detected on each of the next windowSize-1 slides
         for (int i = 0; i < windowSize - 1; i++) {
