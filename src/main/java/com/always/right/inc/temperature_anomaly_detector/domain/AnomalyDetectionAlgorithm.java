@@ -1,6 +1,8 @@
 package com.always.right.inc.temperature_anomaly_detector.domain;
 
+import java.util.Optional;
+
 public interface AnomalyDetectionAlgorithm {
 
-    boolean accept(TemperatureMeasurement measurement);
+    Optional<AnomalyDetectionResult> accept(TemperatureMeasurement measurement);
 }

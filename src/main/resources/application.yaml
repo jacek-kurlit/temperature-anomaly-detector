@@ -10,10 +10,12 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: com.always.right.inc.temperature_anomaly_detector
-        spring.json.type.mapping: temperature-measurement:com.always.right.inc.temperature_anomaly_detector.adapter.inbound.kafka.TemperatureMeasurementsListener$TemperatureMeasurementEvent
+        spring.json.type.mapping: temperature-measurement:com.always.right.inc.temperature_anomaly_detector.adapter.inbound.kafka.TemperatureMeasurementEvent
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.type.mapping: temperature-anomaly-detected:com.always.right.inc.temperature_anomaly_detector.service.TemperatureAnomalyDetectedEvent
     listener:
       observation-enabled: true
   mongodb:
@@ -32,3 +34,7 @@ management:
     metrics:
       export:
         enabled: true
+anomaly-detection:
+  type: consecutive
+  threshold: 5.0
+  window-size: 10

@@ -1,9 +1,11 @@
 package com.always.right.inc.temperature_anomaly_detector.domain;
 
+import java.util.Optional;
+
 public class TimeWindowDetectionAlgorithm implements AnomalyDetectionAlgorithm {
 
     @Override
-    public boolean accept(TemperatureMeasurement measurement) {
-        return false;
+    public Optional<AnomalyDetectionResult> accept(TemperatureMeasurement measurement) {
+        return null;
     }
 }

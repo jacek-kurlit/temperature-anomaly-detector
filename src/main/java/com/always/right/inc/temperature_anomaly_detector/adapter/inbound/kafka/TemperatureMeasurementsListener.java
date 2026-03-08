@@ -1,14 +1,11 @@
 package com.always.right.inc.temperature_anomaly_detector.adapter.inbound.kafka;
 
-import com.always.right.inc.temperature_anomaly_detector.domain.RoomId;
-import com.always.right.inc.temperature_anomaly_detector.domain.ThermometerId;
+import com.always.right.inc.temperature_anomaly_detector.domain.TemperatureMeasurement;
 import com.always.right.inc.temperature_anomaly_detector.service.TemperatureAnomalyDetectionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-
-import java.time.Instant;
 
 @Component
 @RequiredArgsConstructor
@@ -18,21 +15,13 @@ public class TemperatureMeasurementsListener {
 
     @KafkaListener(topics = "temperature-measurements")
     public void handleTemperatureMeasurement(TemperatureMeasurementEvent event) {
-        log.trace("Received temp measurement event for roomId: {}, thermometerId: {}", event.roomId, event.thermometerId);
+        log.trace("Received temp measurement event for roomId: {}, thermometerId: {}", event.roomId(), event.thermometerId());
         temperatureAnomalyDetectionService.handle(
-                event.roomId,
-                event.thermometerId,
-                event.temperature,
-                event.timestamp
+                event.roomId(),
+                event.thermometerId(),
+                new TemperatureMeasurement(event.temperature(), event.timestamp())
         );
-        log.trace("Event for roomId: {}, thermometerId: {} handled", event.roomId, event.thermometerId);
+        log.trace("Event for roomId: {}, thermometerId: {} handled", event.roomId(), event.thermometerId());
     }
 
-    public record TemperatureMeasurementEvent(
-            ThermometerId thermometerId,
-            RoomId roomId,
-            Double temperature,
-            Instant timestamp
-    ) {
-    }
 }
